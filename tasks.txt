@@ -1,0 +1,34 @@
+Task1: Data Engineering and API Development Exercise
+
+Develop a pipeline that involves setting up a MongoDB database using Docker Compose, retrieving and storing data from an external API, and exposing this data through FastAPI.
+
+1. Setup MongoDB with Docker Compose
+Use Docker Compose to set up a MongoDB database.
+
+2. Data Retrieval and Loading into MongoDB
+Retrieve data from the JSONPlaceholder - Free Fake REST API and store it in MongoDB with python.
+
+3. Create a RESTful API with FastAPI
+Develop a FastAPI application to provide access to the mongo data. Include an endpoint to report the total number of posts and comments for each user.
+
+
+
+
+Task 2: Time Series Data Handling and API Development
+
+Turbine 1: https://nextcloud.turbit.com/s/GTbSwKkMnFrKC7A
+Turbine 2: https://nextcloud.turbit.com/s/G3bwdkrXx6Kmxs3
+
+Load time series data from the CSV files above into a MongoDB collection and make the data accessible through the FastAPI.
+
+1. Data Preparation and Loading into MongoDB
+Develop a python script to read the data from the CSV files and load it into a single MongoDB collection.
+
+2. Add FastAPI Endpoint
+Add an FastAPI endpoint that allows to retrieve the data based on turbine id and time ranges
+
+3. Create a Webapp
+Use React to create a power curve plot (power over wind speed) where one can adjust the plotting date range.
+
+Please send us your code in a project file (e.g. GitHub link) and a short description (1-pager) of what you did in advance to our meeting within the next 14 days.
+If you need more time please let us know in advance.
