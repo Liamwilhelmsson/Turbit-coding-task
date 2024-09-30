@@ -6,11 +6,10 @@ from pydantic import BaseModel
 
 from http_client import AsyncHttpClient
 from models import Post, Comment
-from db import MongoDB
+from db import MongoDB, get_db
 
 load_dotenv()
 
-MONGO_DB_CONNECTION_STRING = os.getenv("MONGO_DB_CONNECTION_STRING")
 BASE_URL = "https://jsonplaceholder.typicode.com/"
 
 
@@ -21,20 +20,21 @@ async def fetch_and_store(
     model: BaseModel,
 ):
     data = await client.get(endpoint=endpoint)
-    documents = [model.model_validate(doc) for doc in data]
-    await db.insert_many(collection_name=endpoint, documents=documents)
+    documents = [model.model_validate(entry) for entry in data]
+    await db.replace_or_insert(collection_name=endpoint, documents=documents)
 
 
 async def main():
-    db = MongoDB(db_name="db_name", connection_string=MONGO_DB_CONNECTION_STRING)
+    async with get_db() as db:
+        async with AsyncHttpClient(base_url=BASE_URL) as client:
+            tasks = [
+                fetch_and_store(client=client, db=db, endpoint="posts", model=Post),
+                fetch_and_store(
+                    client=client, db=db, endpoint="comments", model=Comment
+                ),
+            ]
 
-    async with AsyncHttpClient(base_url=BASE_URL) as client:
-        tasks = [
-            fetch_and_store(client=client, db=db, endpoint="posts", model=Post),
-            fetch_and_store(client=client, db=db, endpoint="comments", model=Comment),
-        ]
-
-        await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
