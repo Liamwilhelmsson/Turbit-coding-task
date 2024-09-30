@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from http_client import AsyncHttpClient
 from models import Post, Comment
-from db import MongoDB, get_db
+from db import MongoDB, db_context, get_db_instance
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ async def fetch_and_store(
 
 
 async def main():
-    async with get_db() as db:
+    async with db_context() as db:
         async with AsyncHttpClient(base_url=BASE_URL) as client:
             tasks = [
                 fetch_and_store(client=client, db=db, endpoint="posts", model=Post),
