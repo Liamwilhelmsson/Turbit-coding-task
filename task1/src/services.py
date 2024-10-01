@@ -1,7 +1,11 @@
 from db import MongoDB
 
 
-async def get_user_activity(db: MongoDB, user_id):
+async def get_user_post_count(db: MongoDB, user_id: int):
+    return await db.get_collection("posts").count_documents({"user_id": user_id})
+
+
+async def get_user_activity(db: MongoDB, user_id: int):
     pipeline = user_activity_pipeline()
     pipeline.insert(0, {"$match": {"user_id": user_id}})
 
@@ -37,15 +41,6 @@ def user_activity_pipeline():
                 "_id": "$user_id",
                 "post_count": {"$sum": 1},
                 "comment_count": {"$sum": {"$size": "$comments"}},
-            }
-        },
-        # Change naming of output
-        {
-            "$project": {
-                "_id": 0,
-                "user_id": "$_id",
-                "post_count": 1,
-                "comment_count": 1,
             }
         },
     ]

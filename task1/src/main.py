@@ -2,55 +2,35 @@ from fastapi import FastAPI, Depends
 import uvicorn
 
 from db import MongoDB, get_db
-from services import get_all_user_activity, get_user_activity
+from services import get_all_user_activity, get_user_activity, get_user_post_count
+from schemas import (
+    UserActivityResponse,
+    UserCommentCountResponse,
+    UserPostCountResponse,
+)
 
 app = FastAPI()
 
 
-@app.get("/users/{user_id}/posts/count")
+@app.get("/users/{user_id}/posts/count", response_model=UserPostCountResponse)
 async def user_post_count(user_id: int, db: MongoDB = Depends(get_db)):
-    """
-    Get number of posts for a single user
-    """
-    post_count = await db.get_collection("posts").count_documents({"user_id": user_id})
-    return {"user_id": user_id, "post_count": post_count}
+    count = await get_user_post_count(db, user_id)
+    return UserPostCountResponse(user_id=user_id, post_count=count)
 
 
-@app.get("/users/{user_id}/comments/count")
+@app.get("/users/{user_id}/comments/count", response_model=UserCommentCountResponse)
 async def user_comment_count(user_id: int, db: MongoDB = Depends(get_db)):
-    """
-    Get number of comments for a single user
-    """
-
-    posts = (
-        await db.get_collection("posts").find({"user_id": user_id}).to_list(length=None)
-    )
-    post_ids = [post["_id"] for post in posts]
-
-    comment_count = await db.get_collection("comments").count_documents(
-        {"post_id": {"$in": post_ids}}
-    )
-
-    return {
-        "user_id": user_id,
-        "comment_count": comment_count,
-    }
+    return await get_user_activity(db=db, user_id=user_id)
 
 
-@app.get("/users/{user_id}/activity")
+@app.get("/users/{user_id}/activity", response_model=UserActivityResponse)
 async def user_activity(user_id: int, db: MongoDB = Depends(get_db)):
-
-    activity = await get_user_activity(db=db, user_id=user_id)
-
-    return activity
+    return await get_user_activity(db=db, user_id=user_id)
 
 
-@app.get("/users/activity")
+@app.get("/users/activity", response_model=list[UserActivityResponse])
 async def all_user_activity(db: MongoDB = Depends(get_db)):
-
-    activity = await get_all_user_activity(db=db)
-
-    return activity
+    return await get_all_user_activity(db=db)
 
 
 if __name__ == "__main__":

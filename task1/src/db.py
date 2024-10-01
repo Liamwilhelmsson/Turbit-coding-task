@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, TypeVar
+from typing import TypeVar
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from pymongo import ReplaceOne
@@ -44,11 +44,10 @@ class MongoDB:
 
 
 @asynccontextmanager
-async def db_context() -> AsyncGenerator[MongoDB, None]:
+async def db_context():
     """
     Create an instance of mongo db and ensure that it is closed when exiting the context
     """
-
     db = MongoDB(db_name=DB_NAME, connection_string=MONGO_DB_CONNECTION_STRING)
     try:
         yield db
@@ -56,7 +55,7 @@ async def db_context() -> AsyncGenerator[MongoDB, None]:
         db.close()
 
 
-async def get_db() -> AsyncGenerator[MongoDB, None]:
+async def get_db():
     """
     Yield a db instance that can be used with FastAPI Depends().
     """

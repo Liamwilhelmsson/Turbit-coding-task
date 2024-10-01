@@ -1,12 +1,11 @@
 import asyncio
 
-import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
 from http_client import AsyncHttpClient
 from models import Post, Comment
-from db import MongoDB, db_context, get_db_instance
+from db import MongoDB, db_context
 
 load_dotenv()
 
