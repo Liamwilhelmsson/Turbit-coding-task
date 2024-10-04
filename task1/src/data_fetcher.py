@@ -2,10 +2,13 @@ import asyncio
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from pymongo import ReplaceOne
 
 from http_client import AsyncHttpClient
 from models import Post, Comment
-from db import MongoDB, db_context
+from db import db_context
+from motor.motor_asyncio import AsyncIOMotorCollection
+
 
 load_dotenv()
 
@@ -14,22 +17,36 @@ BASE_URL = "https://jsonplaceholder.typicode.com/"
 
 async def fetch_and_store(
     client: AsyncHttpClient,
-    db: MongoDB,
+    collection: AsyncIOMotorCollection,
     endpoint: str,
     model: BaseModel,
 ):
     data = await client.get(endpoint=endpoint)
     documents = [model.model_validate(entry) for entry in data]
-    await db.replace_or_insert(collection_name=endpoint, documents=documents)
+
+    bulk_operation = [
+        ReplaceOne({"_id": doc.id}, doc.model_dump(by_alias=True), upsert=True)
+        for doc in documents
+    ]
+
+    await collection.bulk_write(bulk_operation)
 
 
 async def main():
     async with db_context() as db:
         async with AsyncHttpClient(base_url=BASE_URL) as client:
             tasks = [
-                fetch_and_store(client=client, db=db, endpoint="posts", model=Post),
                 fetch_and_store(
-                    client=client, db=db, endpoint="comments", model=Comment
+                    client=client,
+                    collection=db.get_collection("posts"),
+                    endpoint="posts",
+                    model=Post,
+                ),
+                fetch_and_store(
+                    client=client,
+                    collection=db.get_collection("comments"),
+                    endpoint="comments",
+                    model=Comment,
                 ),
             ]
 
