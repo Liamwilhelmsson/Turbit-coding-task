@@ -25,20 +25,6 @@ class MongoDB:
     def get_collection(self, collection_name: str):
         return self.db[collection_name]
 
-    async def replace_or_insert(self, collection_name: str, documents: list[T]):
-        """
-        Replace existing documents that matches _id and insert the new ones
-        """
-
-        collection = self.get_collection(collection_name=collection_name)
-
-        bulk_operation = [
-            ReplaceOne({"_id": doc.id}, doc.model_dump(by_alias=True), upsert=True)
-            for doc in documents
-        ]
-
-        await collection.bulk_write(bulk_operation)
-
     def close(self):
         self.client.close()
 
