@@ -10,6 +10,8 @@ import {
 import { useEffect, useState } from "react";
 
 import axios from "axios";
+import { useDateRange } from "@/hooks/UseDateRange";
+import { useTurbineId } from "@/hooks/useTurbineId";
 
 interface TurbineDataResponse {
     turbine_id: number;
@@ -23,16 +25,12 @@ interface TurbineDataAverage {
     avgPowerOutputKw: number;
 }
 
-interface CurvePlotProps {
-    turbineId: number;
-    startTime?: string;
-    endTime?: string;
-}
-
 const BASE_URL = "http://127.0.0.1:8000"; // Should probably be moved somewhere else
 
-export const PowerCurvePlot = ({ turbineId, startTime, endTime }: CurvePlotProps) => {
+export const PowerCurvePlot = () => {
     const [turbineDataAverage, setTurbineDataAverage] = useState<TurbineDataAverage[]>([]);
+    const { dateRange } = useDateRange();
+    const { turbineId } = useTurbineId();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,7 +38,7 @@ export const PowerCurvePlot = ({ turbineId, startTime, endTime }: CurvePlotProps
                 const response = await axios.get<TurbineDataResponse[]>(
                     `${BASE_URL}/turbine/${turbineId}`,
                     {
-                        params: { start_time: startTime, end_time: endTime },
+                        params: { start_time: dateRange?.from, end_time: dateRange?.to },
                     }
                 );
                 const averages = getPowerOutputAverages(response.data);
@@ -51,7 +49,7 @@ export const PowerCurvePlot = ({ turbineId, startTime, endTime }: CurvePlotProps
         };
 
         fetchData();
-    }, [turbineId, startTime, endTime]);
+    }, [turbineId, dateRange]);
 
     const maxWindSpeed = Math.ceil(Math.max(...turbineDataAverage.map((data) => data.windSpeedMs)));
     const maxPowerOutput = Math.ceil(

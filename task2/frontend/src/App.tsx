@@ -1,12 +1,23 @@
-import { PowerCurvePlot } from "./components/CurvePlot";
-import { useState } from "react";
+import { DatePickerWithRange } from "./components/DatePicker";
+import { DateRangeProvider } from "./hooks/UseDateRange";
+import { PowerCurvePlot } from "./components/PowerCurvePlot";
+import { TurbineIdProvider } from "./hooks/useTurbineId";
+import { TurbineInput } from "./components/TurbineInput";
 
 function App() {
-    const [turbineId, setTurbineId] = useState(1);
-    const [startTime, setStartTime] = useState("2016-01-01");
-    const [endTime, setEndTime] = useState("2016-12-30");
-
-    return <PowerCurvePlot turbineId={turbineId} startTime={startTime} endTime={endTime} />;
+    return (
+        <div className="flex flex-col gap-10">
+            <DateRangeProvider>
+                <TurbineIdProvider>
+                    <PowerCurvePlot />
+                    <div className="flex flex-row gap-10 justify-center">
+                        <TurbineInput />
+                        <DatePickerWithRange />
+                    </div>
+                </TurbineIdProvider>
+            </DateRangeProvider>
+        </div>
+    );
 }
 
 export default App;
