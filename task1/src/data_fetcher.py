@@ -1,14 +1,12 @@
 import asyncio
 
+from db import db_context
 from dotenv import load_dotenv
+from http_client import AsyncHttpClient
+from models import Comment, Post
+from motor.motor_asyncio import AsyncIOMotorCollection
 from pydantic import BaseModel
 from pymongo import ReplaceOne
-
-from http_client import AsyncHttpClient
-from models import Post, Comment
-from db import db_context
-from motor.motor_asyncio import AsyncIOMotorCollection
-
 
 load_dotenv()
 

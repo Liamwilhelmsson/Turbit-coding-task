@@ -1,12 +1,10 @@
+import os
 from contextlib import asynccontextmanager
 from typing import TypeVar
+
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from pymongo import ReplaceOne
-
-import os
-from dotenv import load_dotenv
-
 
 load_dotenv()
 

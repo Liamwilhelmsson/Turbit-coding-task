@@ -1,11 +1,21 @@
 from datetime import datetime
-from fastapi import FastAPI, Depends
-import uvicorn
 
+import uvicorn
 from db import MongoDB, get_db
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from schemas import TurbineDataResponse
 
 app = FastAPI()
+
+origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/turbine/{turbine_id}", response_model=list[TurbineDataResponse])
@@ -18,6 +28,7 @@ async def turbine_data(
     collection = db.get_collection("turbine_data")
     query = {"turbine_id": turbine_id}
 
+    # Add filter start- and end_time filter if needed
     if start_time or end_time:
         timestamp_filter = {}
         if start_time:

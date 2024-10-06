@@ -1,15 +1,18 @@
 import asyncio
 import os
-from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorCollection
 
 import pandas as pd
-from models import TurbineData
 from db import db_context
+from dotenv import load_dotenv
+from models import TurbineData
+from motor.motor_asyncio import AsyncIOMotorCollection
 
 load_dotenv()
 
-FILEPATH_PER_TURBINE = {1: "Turbine1.csv", 2: "Turbine2.csv"}
+FILEPATH_PER_TURBINE = {
+    1: "Turbine1.csv",
+    2: "Turbine2.csv",
+}  # Could also be fetched directly but out of scope
 
 
 async def parse_and_store_csv(
