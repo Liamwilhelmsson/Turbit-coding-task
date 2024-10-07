@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import { useDateRange } from "@/hooks/UseDateRange";
+import { useDateRange } from "@/hooks/useDateRange";
 import { useTurbineId } from "@/hooks/useTurbineId";
 
 interface TurbineDataResponse {
@@ -36,7 +36,7 @@ export const PowerCurvePlot = () => {
         const fetchData = async () => {
             try {
                 const response = await axios.get<TurbineDataResponse[]>(
-                    `${BASE_URL}/turbine/${turbineId}`,
+                    `${BASE_URL}/turbine/${turbineId ? turbineId : 1}`,
                     {
                         params: { start_time: dateRange?.from, end_time: dateRange?.to },
                     }
@@ -60,10 +60,11 @@ export const PowerCurvePlot = () => {
         <ResponsiveContainer width="100%" height={800}>
             <LineChart
                 data={turbineDataAverage}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 5, right: 30, left: 20, bottom: 20 }}
             >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
+                    label={{ value: "Wind speed (ms)", position: "outside", dy: 25 }}
                     dataKey="windSpeedMs"
                     domain={[0, maxWindSpeed]}
                     ticks={Array.from({ length: maxWindSpeed + 1 }, (_, i) => i)}
